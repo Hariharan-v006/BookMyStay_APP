@@ -1,31 +1,30 @@
+import java.util.*;
+
 public class BookMyStay {
 
     public static void main(String[] args) {
         System.out.println("Welcome to BookMyStay Hotel Booking System");
         System.out.println("Version: 1.0\n");
 
-        int singleRoomAvailable = 5;
-        int doubleRoomAvailable = 3;
-        int suiteRoomAvailable = 2;
+        // Initialize inventory
+        RoomInventory inventory = new RoomInventory();
+        inventory.registerRoom("Single Room", 5);
+        inventory.registerRoom("Double Room", 3);
+        inventory.registerRoom("Suite Room", 2);
 
-        Room singleRoom = new SingleRoom("Single Room", 1, 20, 50);
-        Room doubleRoom = new DoubleRoom("Double Room", 2, 35, 80);
-        Room suiteRoom = new SuiteRoom("Suite Room", 3, 60, 150);
+        // Initialize rooms
+        List<Room> rooms = new ArrayList<>();
+        rooms.add(new SingleRoom("Single Room", 1, 20, 50));
+        rooms.add(new DoubleRoom("Double Room", 2, 35, 80));
+        rooms.add(new SuiteRoom("Suite Room", 3, 60, 150));
 
-        System.out.println(singleRoom);
-        System.out.println("Available: " + singleRoomAvailable + "\n");
-
-        System.out.println(doubleRoom);
-        System.out.println("Available: " + doubleRoomAvailable + "\n");
-
-        System.out.println(suiteRoom);
-        System.out.println("Available: " + suiteRoomAvailable + "\n");
+        // Search service
+        RoomSearchService searchService = new RoomSearchService(inventory, rooms);
+        System.out.println("Available Rooms:\n");
+        searchService.displayAvailableRooms();
     }
 }
 
-/**
- * Abstract class representing a generic hotel room.
- */
 abstract class Room {
     private String name;
     private int beds;
@@ -50,9 +49,6 @@ abstract class Room {
     }
 }
 
-/**
- * Concrete room types
- */
 class SingleRoom extends Room {
     public SingleRoom(String name, int beds, int size, double price) {
         super(name, beds, size, price);
@@ -68,5 +64,45 @@ class DoubleRoom extends Room {
 class SuiteRoom extends Room {
     public SuiteRoom(String name, int beds, int size, double price) {
         super(name, beds, size, price);
+    }
+}
+
+class RoomInventory {
+    private Map<String, Integer> availabilityMap;
+
+    public RoomInventory() {
+        availabilityMap = new HashMap<>();
+    }
+
+    public void registerRoom(String roomName, int count) {
+        availabilityMap.put(roomName, count);
+    }
+
+    public int getAvailability(String roomName) {
+        return availabilityMap.getOrDefault(roomName, 0);
+    }
+
+    public void updateAvailability(String roomName, int change) {
+        availabilityMap.put(roomName, getAvailability(roomName) + change);
+    }
+}
+
+class RoomSearchService {
+    private RoomInventory inventory;
+    private List<Room> rooms;
+
+    public RoomSearchService(RoomInventory inventory, List<Room> rooms) {
+        this.inventory = inventory;
+        this.rooms = rooms;
+    }
+
+    public void displayAvailableRooms() {
+        for (Room room : rooms) {
+            int available = inventory.getAvailability(room.getName());
+            if (available > 0) {
+                System.out.println(room);
+                System.out.println("Available: " + available + "\n");
+            }
+        }
     }
 }
