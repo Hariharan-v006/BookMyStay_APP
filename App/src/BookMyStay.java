@@ -18,10 +18,22 @@ public class BookMyStay {
         rooms.add(new DoubleRoom("Double Room", 2, 35, 80));
         rooms.add(new SuiteRoom("Suite Room", 3, 60, 150));
 
-        // Search service
+        // Initialize search service
         RoomSearchService searchService = new RoomSearchService(inventory, rooms);
         System.out.println("Available Rooms:\n");
         searchService.displayAvailableRooms();
+
+        // Initialize booking queue
+        BookingRequestQueue bookingQueue = new BookingRequestQueue();
+
+        // Simulate booking requests
+        bookingQueue.addRequest(new Reservation("Alice", "Single Room"));
+        bookingQueue.addRequest(new Reservation("Bob", "Double Room"));
+        bookingQueue.addRequest(new Reservation("Charlie", "Suite Room"));
+        bookingQueue.addRequest(new Reservation("Diana", "Single Room"));
+
+        System.out.println("Booking Requests in Queue (First-Come-First-Served):\n");
+        bookingQueue.displayQueue();
     }
 }
 
@@ -103,6 +115,50 @@ class RoomSearchService {
                 System.out.println(room);
                 System.out.println("Available: " + available + "\n");
             }
+        }
+    }
+}
+
+class Reservation {
+    private String guestName;
+    private String roomType;
+
+    public Reservation(String guestName, String roomType) {
+        this.guestName = guestName;
+        this.roomType = roomType;
+    }
+
+    public String getGuestName() { return guestName; }
+    public String getRoomType() { return roomType; }
+
+    @Override
+    public String toString() {
+        return "Guest: " + guestName + ", Requested Room: " + roomType;
+    }
+}
+
+class BookingRequestQueue {
+    private Queue<Reservation> queue;
+
+    public BookingRequestQueue() {
+        queue = new LinkedList<>();
+    }
+
+    public void addRequest(Reservation reservation) {
+        queue.offer(reservation);
+    }
+
+    public Reservation processNextRequest() {
+        return queue.poll(); // removes and returns the head
+    }
+
+    public void displayQueue() {
+        if (queue.isEmpty()) {
+            System.out.println("No booking requests in the queue.");
+            return;
+        }
+        for (Reservation r : queue) {
+            System.out.println(r);
         }
     }
 }
