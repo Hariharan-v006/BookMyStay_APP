@@ -1,5 +1,4 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class BookMyStay {
 
@@ -7,28 +6,22 @@ public class BookMyStay {
         System.out.println("Welcome to BookMyStay Hotel Booking System");
         System.out.println("Version: 1.0\n");
 
+        // Initialize inventory
         RoomInventory inventory = new RoomInventory();
         inventory.registerRoom("Single Room", 5);
         inventory.registerRoom("Double Room", 3);
         inventory.registerRoom("Suite Room", 2);
 
-        Room singleRoom = new SingleRoom("Single Room", 1, 20, 50);
-        Room doubleRoom = new DoubleRoom("Double Room", 2, 35, 80);
-        Room suiteRoom = new SuiteRoom("Suite Room", 3, 60, 150);
+        // Initialize rooms
+        List<Room> rooms = new ArrayList<>();
+        rooms.add(new SingleRoom("Single Room", 1, 20, 50));
+        rooms.add(new DoubleRoom("Double Room", 2, 35, 80));
+        rooms.add(new SuiteRoom("Suite Room", 3, 60, 150));
 
-        displayRoom(singleRoom, inventory);
-        displayRoom(doubleRoom, inventory);
-        displayRoom(suiteRoom, inventory);
-
-        // Example of updating availability
-        inventory.updateAvailability("Single Room", -1); // booked 1 single room
-        System.out.println("\nAfter booking 1 Single Room:");
-        displayRoom(singleRoom, inventory);
-    }
-
-    private static void displayRoom(Room room, RoomInventory inventory) {
-        System.out.println(room);
-        System.out.println("Available: " + inventory.getAvailability(room.getName()) + "\n");
+        // Search service
+        RoomSearchService searchService = new RoomSearchService(inventory, rooms);
+        System.out.println("Available Rooms:\n");
+        searchService.displayAvailableRooms();
     }
 }
 
@@ -91,5 +84,25 @@ class RoomInventory {
 
     public void updateAvailability(String roomName, int change) {
         availabilityMap.put(roomName, getAvailability(roomName) + change);
+    }
+}
+
+class RoomSearchService {
+    private RoomInventory inventory;
+    private List<Room> rooms;
+
+    public RoomSearchService(RoomInventory inventory, List<Room> rooms) {
+        this.inventory = inventory;
+        this.rooms = rooms;
+    }
+
+    public void displayAvailableRooms() {
+        for (Room room : rooms) {
+            int available = inventory.getAvailability(room.getName());
+            if (available > 0) {
+                System.out.println(room);
+                System.out.println("Available: " + available + "\n");
+            }
+        }
     }
 }
